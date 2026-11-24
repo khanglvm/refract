@@ -2,8 +2,8 @@
 
 ## 1.2.0
 
-- An update that changes nothing, such as assigning a field the value it already has, no longer notifies subscribers, so their selectors do not run.
-- On a store with a post-flush callback, a read before the batch runs the callback first. Before, a component that rerendered for another reason in the same event, or a snapshot getter call in the handler, could see derived values from before the update. The callback still runs once per batch unless something reads between updates. A callback that throws now throws in that read, such as during the render, instead of in the microtask.
+- An update that changes nothing, such as assigning a field the value it already has, no longer notifies subscribers, so their selectors do not run. A partial object with an object or array value still notifies, because the value is deep-copied.
+- On a store with a post-flush callback, a read before the batch runs the callback first. Before, a component that rerendered for another reason in the same event, or a snapshot getter call in the handler, could see derived values from before the update. The callback still runs once per batch unless something reads between updates. A `setState` draft does not run it, so a second update in the same handler still sees derived values from before the first. A callback that throws now throws in that read instead of in the microtask. When the read is a render, React can retry the render, which then succeeds without the callback's changes and reports the error only as a recoverable error.
 - The docs now say how to keep update cost low: change many items in one `setState` draft, call `setState` outside render, and use `createRoot` for batching outside event handlers.
 
 ## 1.1.0

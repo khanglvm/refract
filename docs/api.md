@@ -98,7 +98,7 @@ Reads the current state, or the selector's result, at call time without subscrib
 useSetPostFlush(): (callback: (draft: Draft<State>) => void) => void
 ```
 
-Returns a stable function that registers the Provider's post-flush callback. The callback runs once per microtask batch, after the batch's updates and before subscribers are notified. A read of the state before the batch runs it early, so derived values are never behind. While a callback is registered, that Provider notifies once per batch instead of on every update, so a controlled text input that reads from it moves its caret to the end as you type; give such a field local state or make it uncontrolled. Each Provider holds one callback; registering replaces it, and there is no unregister. Its changes are not part of any revert. See [Post-flush callbacks](post-flush.md).
+Returns a stable function that registers the Provider's post-flush callback. The callback runs once per microtask batch, after the batch's updates and before subscribers are notified. A hook or snapshot getter that reads before the batch runs it first, so the read sees current derived values. A `setState` draft does not run it, so a second update in the same batch sees derived values from before the first. While a callback is registered, that Provider notifies once per batch instead of on every update, so a controlled text input that reads from it moves its caret to the end as you type; give such a field local state or make it uncontrolled. Each Provider holds one callback; registering replaces it, and there is no unregister. Its changes are not part of any revert. See [Post-flush callbacks](post-flush.md).
 
 ### withContextProvider
 

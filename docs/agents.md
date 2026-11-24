@@ -137,7 +137,7 @@ Post-flush:
 
 - Register once, from one component inside the Provider, in an effect. Each Provider holds one callback; registering again replaces it; there is no unregister.
 - Use it to recompute derived data once per batch: updates set a stale flag, the callback checks the flag and recomputes.
-- A read before the batch (a render or a snapshot getter call) runs the callback early, so derived values are never behind. Reading between a handler's own updates runs it once per read.
+- A read before the batch (a render or a snapshot getter call) runs the callback early, so the read sees current derived values. Reading between a handler's own updates runs it once per read. A `setState` draft does not run it: a second update in the same handler sees derived values from before the first.
 
 ## Next.js App Router
 

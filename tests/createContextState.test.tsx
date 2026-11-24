@@ -191,7 +191,7 @@ test('selectors skip unrelated changes and synchronous updates share one postFlu
       set({ count: 1 })
       set(draft => { draft.count++ })
       assert.equal(flushes, 0)
-      // A read before the batch runs the callback early, so derived values are never behind.
+      // A read before the batch runs the callback early, so the snapshot has current derived values.
       assert.equal(snapshot().doubled, 4)
       assert.equal(flushes, 1)
       await Promise.resolve()
