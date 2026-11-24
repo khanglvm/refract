@@ -10,7 +10,7 @@ Refract works with React 18 and 19, and with the Next.js App Router. The pattern
 
 `createContextState<State>()` returns a Provider and a set of hooks typed to `State`:
 
-- Fine-grained rerenders. A component rerenders only when its selector's result changes, compared by value, so a selector can return derived objects and arrays. Components that only write never subscribe, and several synchronous updates notify subscribers once.
+- Fine-grained rerenders. A component rerenders only when its selector's result changes, compared by value, so a selector can return derived objects and arrays. Components that only write never subscribe, and several updates in one event handler render once.
 - Nested updates without spreading. Assign to the draft (`draft.user.address.city = 'Hanoi'`) or pass a partial object to replace top-level keys.
 - Direct reads. A selector picks the nested value it needs, and a snapshot getter reads the latest state inside async handlers without subscribing the component.
 - Next.js and server rendering. Every module ships with `'use client'`, a server component can seed a Provider with `initialState`, and each Provider creates its own store on the server, so two requests never share state.

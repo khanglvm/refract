@@ -14,7 +14,11 @@ The value comparison descends into plain objects and arrays, compares `Date` by 
 
 Every update goes through Immer. The default setter records patches so the update can be reverted; the setter from `enableRevert = false` does not. The new state replaces the old one in the ref immediately, so the snapshot getter sees it on the next line.
 
-Notifications are batched. The first update in a tick queues a microtask; when it runs, the post-flush callback (if one is registered) applies its changes, and then every subscriber is notified once. The microtask runs before the browser paints.
+Without a post-flush callback, each update notifies subscribers right away. React needs that for controlled inputs: at the end of an input event it puts back the value the input rendered with, unless a store has already told it about the new one, and a later rewrite moves the caret to the end. React batches the renders those notifications cause, so several updates in one event handler render once.
+
+With a post-flush callback, notifications are batched instead. The first update in a tick queues a microtask; when it runs, the callback applies its changes, and then every subscriber is notified once. The microtask runs before the browser paints. Subscribers are notified only after the callback has run, but a component that rerenders for another reason in the same event, such as a `useState` update, reads the new state before the callback has run.
+
+Updates made before a callback is registered, for example in a sibling's mount effect, are notified right away; registering the callback then queues one batch so it also runs for them.
 
 A partial object is turned into a draft function that assigns a deep copy of each listed field. The copy rules are in [Update state](updates.md#keep-state-to-plain-data).
 

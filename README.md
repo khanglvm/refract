@@ -66,7 +66,7 @@ When the value of a plain React context changes, every component that reads that
 - A component that reads `state.user.address.city` does not rerender when `state.filter` changes.
 - A selector can return derived data such as `state.todos.filter(t => t.done)`. The component rerenders when the list of done todos changes, not every time the selector builds a new array.
 - A component that only calls `useSetContextState()` never subscribes, so no update rerenders it.
-- Several `setState` calls in the same synchronous code, such as one event handler, notify subscribers once.
+- Several `setState` calls in one event handler render once. Refract tells React about each update right away, so controlled inputs keep their caret, and React batches the renders.
 - The Provider compares `initialState` and `children` by value, so a parent that rerenders and passes an equal `initialState` object does not rerender the tree below it.
 
 In development builds, `useContextStateValue` runs each selector twice and throws if the two results differ. This catches a selector such as `s => ({ id: Math.random() })`, which would otherwise rerender in a loop.

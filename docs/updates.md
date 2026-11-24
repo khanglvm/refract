@@ -46,7 +46,7 @@ Like Immer, the freeze does not reach class instances, the keys and values insid
 
 ## When subscribers see the change
 
-The state changes immediately, so the snapshot getter sees it on the next line. Subscribers are notified once per microtask, so several `setState` calls in one handler cause one rerender pass.
+The state changes immediately, so the snapshot getter sees it on the next line. Subscribers are notified right away, and React batches the renders, so several `setState` calls in one handler cause one rerender pass. A store with a [post-flush callback](post-flush.md) notifies once per batch instead.
 
 ## Read the latest state in handlers
 

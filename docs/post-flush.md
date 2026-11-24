@@ -1,6 +1,6 @@
 # Post-flush callbacks
 
-A post-flush callback recomputes an expensive derived value once per batch of updates instead of once per update. It runs after all updates in a microtask and before subscribers are notified, and it receives an Immer draft.
+A post-flush callback recomputes an expensive derived value once per batch of updates instead of once per update. It runs after all updates in a microtask and before subscribers are notified, and it receives an Immer draft. Registering one switches that Provider from notifying on every update to notifying once per batch.
 
 ## Register the callback
 
@@ -50,3 +50,5 @@ setState(draft => {
 - Render the registrar once inside the Provider.
 - Each Provider holds one callback. Registering again replaces it, and there is no unregister function.
 - Changes made by the callback are not part of any revert.
+- Updates made before registration, such as one in a sibling's mount effect, are notified right away. Registering the callback then queues one batch, so it also runs for them.
+- Controlled text inputs that read from this store move their caret to the end while you type, because the store notifies a microtask after the input event. Give such a field local `useState` or make it uncontrolled.

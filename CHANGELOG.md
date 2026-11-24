@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+Controlled inputs keep their caret. Before, typing in the middle of an `<input value={…}>` that read from a store moved the caret to the end, because subscribers heard about the update one microtask after the input event.
+
+- Stores without a post-flush callback now notify subscribers synchronously on every update. React still batches the renders, so several updates in one event handler render once. Calling `setState` or `revert` during a render now gets React's "Cannot update a component while rendering a different component" warning when the update changes what a mounted component selects; move that call into an effect or an event handler.
+- With `createRoot`, updates outside event handlers (`setTimeout`, after `await`) still render once, because React batches them. A React 18 legacy root (`ReactDOM.render`) batches only inside its event handlers, so several updates in a timeout or after `await` now render once each; wrap them in `unstable_batchedUpdates` or move to `createRoot`.
+- Stores with a post-flush callback keep the microtask batching, so the callback still runs once per batch before subscribers are notified. Updates made before the callback is registered get one batch when it registers. Controlled text inputs on those stores still move the caret; see [Post-flush callbacks](docs/post-flush.md).
+
 ## 1.0.1
 
 Docs only. The README, the docs overview and `llms.txt` now describe what the engine does: rerenders limited to components whose selected value changed, nested updates without spreading, Next.js App Router and server rendering support, and undo. No code changes.

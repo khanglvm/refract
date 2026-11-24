@@ -12,7 +12,7 @@ type Feature = { id: string; title: string; body: string; icon: ComponentType<SV
 
 const FEATURES: Feature[] = [
   { id: 'rerenders', title: 'Fine-grained rerenders', icon: FilterIcon, Playground: RerendersPlayground,
-    body: 'A component rerenders only when the value its selector returns changes, compared by value. Writer-only components never subscribe, and updates in one click notify once.' },
+    body: 'A component rerenders only when the value its selector returns changes, compared by value. Writer-only components never subscribe, and several updates in one click render once.' },
   { id: 'drafts', title: 'No spreading', icon: PenIcon, Playground: NoSpreadingPlayground,
     body: 'Assign to a nested field on the draft and Immer builds the next state. Type a city and compare the two updates.' },
   { id: 'server', title: 'Next.js ready', icon: ServerIcon, Playground: ServerRenderPlayground,

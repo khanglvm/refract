@@ -2,7 +2,8 @@
 
 /**
  * React context state with Immer updates and selective subscriptions.
- * Each Provider owns its state. Synchronous updates notify subscribers in one microtask.
+ * Each Provider owns its state. Updates notify subscribers synchronously; with a post-flush callback
+ * registered, updates in one tick are batched into a single microtask instead.
  */
 
 import {
@@ -295,8 +296,9 @@ export function createContextState<State extends Record<string | number, unknown
    * - Immer-powered immutable updates with patch/undo functionality
    * - Subscriber management for component re-renders
    * - State snapshot access for computations
-   * - Microtask batching: multiple rapid setState calls produce ONE subscriber notification
-   * - Optional postFlush callback: runs once before subscribers are notified (e.g., lazy hierarchy recompute)
+   * - Synchronous notification, so controlled inputs keep their caret; React batches the renders
+   * - Optional postFlush callback: switches to microtask batching and runs once per batch before
+   *   subscribers are notified (e.g., lazy hierarchy recompute)
    *
    * @param initialState - Optional initial state for component-level initialization
    *
@@ -342,17 +344,39 @@ export function createContextState<State extends Record<string | number, unknown
     // Whether a microtask is already queued to flush changes to subscribers
     const batchPendingRef = useRef(false)
 
+    // Whether an update was announced before any post-flush callback existed. A callback registered
+    // later (often in an effect that runs after a sibling's mount effect) still owes those updates a pass.
+    const updatedWithoutPostFlushRef = useRef(false)
+
     // SSR-safe microtask scheduler
     const scheduleMicrotask = typeof queueMicrotask === 'function'
       ? queueMicrotask
       : (fn: () => void) => { Promise.resolve().then(fn) }
 
+    // Iterates over a copy, so a subscriber that unsubscribes while being notified cannot skip another.
+    function notifySubscribers() {
+      for (const subscribeCallback of [...subscribers.current]) {
+        subscribeCallback()
+      }
+    }
+
     /**
      * Notifies all subscribed React components that state has changed.
-     * Batches multiple synchronous setState calls into a single notification
-     * via queueMicrotask (fires before next browser paint, safe for useSyncExternalStore).
+     *
+     * Without a post-flush callback, subscribers hear about every update synchronously, inside the event
+     * that caused it. React needs that for controlled inputs: it restores an input's value right after
+     * the event handler, so a later notification rewrites the field and moves the caret to the end.
+     * React still batches the resulting renders, so several updates in one handler render once.
+     *
+     * With a post-flush callback, updates in the same tick are batched into one microtask instead,
+     * so the callback runs once per batch and subscribers are notified only after it has run.
      */
     function emitChanges() {
+      if (!postFlushRef.current) {
+        updatedWithoutPostFlushRef.current = true
+        notifySubscribers()
+        return
+      }
       if (!batchPendingRef.current) {
         batchPendingRef.current = true
         scheduleMicrotask(() => {
@@ -366,9 +390,7 @@ export function createContextState<State extends Record<string | number, unknown
             stateRef.current = produce(stateRef.current, postFlushRef.current)
           }
           // Notify all subscribers after all mutations + postFlush are applied
-          for (const subscribeCallback of subscribers.current) {
-            subscribeCallback()
-          }
+          notifySubscribers()
         })
       }
     }
@@ -390,6 +412,10 @@ export function createContextState<State extends Record<string | number, unknown
      */
     const setPostFlush = useCallback((callback: (draft: Draft<State>) => void) => {
       postFlushRef.current = callback
+      if (updatedWithoutPostFlushRef.current) {
+        updatedWithoutPostFlushRef.current = false
+        emitChanges()
+      }
     }, [])
 
     /**

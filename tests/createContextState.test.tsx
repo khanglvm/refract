@@ -204,6 +204,46 @@ test('selectors skip unrelated changes and synchronous updates share one postFlu
   }
 })
 
+// A sibling's mount effect can update the store before the registrar's effect runs. Those updates
+// skipped the callback, so registering must still run it once over the current state.
+test('a post-flush callback registered after earlier updates still runs for them', async () => {
+  installDOM()
+  const state = createContextState<{ n: number; doubled: number; stale: boolean }>()
+  function Loader() {
+    const set = state.useSetContextState()
+    React.useEffect(() => { set(draft => { draft.n = 5; draft.stale = true }) }, [set])
+    return null
+  }
+  function Registrar() {
+    const setPostFlush = state.useSetPostFlush()
+    React.useEffect(() => {
+      setPostFlush(draft => {
+        if (!draft.stale) return
+        draft.doubled = draft.n * 2
+        draft.stale = false
+      })
+    }, [setPostFlush])
+    return null
+  }
+  function Value() {
+    const value = state.useContextStateValue(s => `${s.n}:${s.doubled}`)
+    return <span>{value}</span>
+  }
+  const container = document.createElement('div')
+  const root = createRoot(container)
+  try {
+    await act(async () => {
+      root.render(<state.Provider initialState={{ n: 0, doubled: 0, stale: false }}>
+        <Loader /><Registrar /><Value />
+      </state.Provider>)
+    })
+    await act(async () => { await Promise.resolve() })
+    assert.equal(container.textContent, '5:10')
+  } finally {
+    await act(async () => root.unmount())
+  }
+})
+
 test('revert preserves unrelated updates and fast setters return a no-op revert', async () => {
   installDOM()
   const state = createContextState<{ count: number; other: number; user: { name: string } }>()
@@ -460,5 +500,44 @@ test('StateSynchronizer compares Dates, Maps and Sets by reference, so a new one
     assert.deepEqual({ ...snapshot() }, { day: 15, keys: 1 })
   } finally {
     await act(async () => root.unmount())
+  }
+})
+
+// Stores without a post-flush callback notify synchronously, so controlled inputs keep their caret
+// (tests/controlledInput.test.tsx). React must still render several updates from one click once.
+test('without a post-flush callback, several updates in one click render once', async () => {
+  installDOM()
+  const previousAct = Object.getOwnPropertyDescriptor(globalThis, 'IS_REACT_ACT_ENVIRONMENT')
+  Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', { configurable: true, value: false })
+  const store = createContextState<{ a: number; b: number }>()
+  let renders = 0
+  function Sum() {
+    const sum = store.useContextStateValue(s => s.a + s.b)
+    renders++
+    return <span>{sum}</span>
+  }
+  function Button() {
+    const setState = store.useSetContextState()
+    return <button onClick={() => {
+      setState({ a: 1 })
+      setState(d => { d.b = 2 })
+      setState(d => { d.a += 1 })
+    }}>go</button>
+  }
+  const container = document.body.appendChild(document.createElement('div'))
+  const root = createRoot(container)
+  const tick = () => new Promise(resolve => setTimeout(resolve, 0))
+  try {
+    root.render(<store.Provider initialState={{ a: 0, b: 0 }}><Sum /><Button /></store.Provider>)
+    await tick()
+    const before = renders
+    container.querySelector('button')!.dispatchEvent(new dom!.window.MouseEvent('click', { bubbles: true }))
+    await tick()
+    assert.equal(container.querySelector('span')!.textContent, '4')
+    assert.equal(renders, before + 1)
+  } finally {
+    root.unmount()
+    container.remove()
+    if (previousAct) Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', previousAct)
   }
 })

@@ -97,7 +97,7 @@ State shape and updates:
 
 - Keep state plain data: objects, arrays, primitives, `Date`, `RegExp`, `Map`, `Set`, `ArrayBuffer`, typed arrays. Values in a partial object are deep-copied. `Error`, `Promise`, `WeakMap`, `WeakSet`, `URL` and `Blob` throw `Unsupported type`. Class instances are copied as plain objects and lose their prototype. Functions, `AbortSignal` and `FormData` are kept by reference. Store `String(error)`, not the error.
 - `setState({ field })` replaces whole top-level fields and never merges nested objects. Use `setState(draft => { ... })` for nested edits. A draft function returns nothing.
-- State changes synchronously; subscribers are notified once per microtask.
+- State changes synchronously and subscribers are notified right away; React batches the renders, so several updates in one handler render once. With a post-flush callback registered, notifications wait for one microtask per batch.
 
 Freezing:
 
@@ -150,7 +150,7 @@ Post-flush:
 | --- | --- |
 | Exports | `createContextState`, `TContextState`, `TDeepReadonly`, `TDeepMutable` only |
 | `State` type | Must satisfy `Record<string \| number, unknown>`; interfaces do not |
-| Change tracking | Selector-level, not field-level; every subscriber's selector runs on each batch |
+| Change tracking | Selector-level, not field-level; every subscriber's selector runs on each update, or on each batch when a post-flush callback is registered |
 | Selected values | Compared by value; no cycles |
 | Partial-object values | Deep-copied; unsupported types throw `Unsupported type` |
 | Revert | One update at a time; no history, no redo |
