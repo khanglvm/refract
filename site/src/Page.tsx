@@ -2,7 +2,8 @@
 import { CopyCommand } from './CopyCommand'
 import { Demo } from './Demo'
 import { Logo } from './Logo'
-import { BookIcon, FilterIcon, GithubIcon, LayersIcon, PenIcon, ServerIcon, UndoIcon } from './icons'
+import { Features } from './Features'
+import { BookIcon, GithubIcon } from './icons'
 
 const DOCS_URL = 'https://docs.khangle.dev/refract'
 const GITHUB_URL = 'https://github.com/khanglvm/refract'
@@ -32,13 +33,6 @@ export default function App() {
   )
 }`
 
-const FEATURES = [
-  { icon: FilterIcon, title: 'Fine-grained rerenders', body: 'A component rerenders only when the value its selector returns changes, compared by value, so derived arrays and objects are safe. Writer-only components never subscribe.' },
-  { icon: PenIcon, title: 'No spreading', body: 'Write draft.user.address.city = "Hanoi" and Immer builds the next state. A partial object replaces only the top-level keys you pass.' },
-  { icon: ServerIcon, title: 'Next.js ready', body: "Every module ships with 'use client'. Seed a Provider from a server component, and each server render gets its own store." },
-  { icon: UndoIcon, title: 'Undo any update', body: 'Every update returns revert, which undoes only what that update changed. Optimistic saves take a few lines.' },
-  { icon: LayersIcon, title: 'Scoped stores', body: 'State lives in the Provider. Mount one per app, per route or per list item, and nest them freely.' },
-]
 
 function Header() {
   return (
@@ -87,19 +81,6 @@ function ExampleSection() {
       <h2>A store in a few lines</h2>
       <p>Clicking the button rerenders <code>Count</code>. <code>AddOne</code> only writes, so it never subscribes.</p>
       <pre className="code"><code>{EXAMPLE}</code></pre>
-    </section>
-  )
-}
-
-function Features() {
-  return (
-    <section className="section">
-      <h2>What you get</h2>
-      <ul className="features">
-        {FEATURES.map(({ icon: Icon, title, body }) => (
-          <li key={title}><span className="tile"><Icon /></span><h3>{title}</h3><p>{body}</p></li>
-        ))}
-      </ul>
     </section>
   )
 }

@@ -18,7 +18,7 @@ const MAX_ITEMS = 4
 const demo = createContextState<DemoState>('refract-site-demo')
 
 /** Card that counts its renders and replays a highlight each time it renders again. */
-function SubscriberCard({ title, selector, children }: { title: string; selector: string; children: ReactNode }) {
+export function SubscriberCard({ title, selector, children }: { title: string; selector: string; children: ReactNode }) {
   const renders = useRef(0)
   renders.current += 1
   return (
