@@ -15,7 +15,9 @@ function Editor() {
       <div>
         <label className="field">
           <span>City</span>
-          <input value={city} maxLength={24} onChange={e => { const next = e.target.value; setState(d => { d.user.address.city = next }) }} />
+          {/* Uncontrolled: subscribers hear about an update one microtask later, after React has already
+              reset a controlled input, so a controlled field would jump the caret to the end. */}
+          <input defaultValue={city} maxLength={24} onChange={e => { const next = e.target.value; setState(d => { d.user.address.city = next }) }} />
         </label>
         <pre className="state-view" aria-label="Current state"><code>{JSON.stringify({ user }, null, 2)}</code></pre>
       </div>

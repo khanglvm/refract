@@ -38,12 +38,13 @@ export function Features() {
     row.scrollTo({ left, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
   }, [active])
 
-  // Arrow keys move between tabs, as the WAI-ARIA tabs pattern expects.
+  // Arrow keys move between tabs and Home/End jump to the ends, as the WAI-ARIA tabs pattern expects.
   const onKeyDown = (e: KeyboardEvent) => {
+    const last = FEATURES.length - 1
     const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0
-    if (!step) return
+    const next = e.key === 'Home' ? 0 : e.key === 'End' ? last : step ? (active + step + FEATURES.length) % FEATURES.length : -1
+    if (next < 0) return
     e.preventDefault()
-    const next = (active + step + FEATURES.length) % FEATURES.length
     setActive(next)
     tabs.current[next]?.focus()
   }
@@ -52,7 +53,7 @@ export function Features() {
     <section className="section">
       <h2>What you get</h2>
       <div className="explorer">
-        <div className="feature-tabs" role="tablist" aria-label="Features" onKeyDown={onKeyDown}>
+        <div className="feature-tabs" role="tablist" aria-label="Features" aria-orientation="vertical" onKeyDown={onKeyDown}>
           {FEATURES.map(({ id, title, icon: Icon }, i) => (
             <button key={id} ref={el => { tabs.current[i] = el }} type="button" role="tab" id={`tab-${id}`}
               aria-selected={i === active} aria-controls={`panel-${id}`} tabIndex={i === active ? 0 : -1}

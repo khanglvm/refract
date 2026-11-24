@@ -32,7 +32,7 @@ function FilterLabel() {
   return <SubscriberCard title="Filter" selector="s => s.filter">{filter}</SubscriberCard>
 }
 
-/** Writes only, so it never subscribes; its own render count stays at 1. */
+/** Writes only, so it never subscribes and no update rerenders it. */
 function Buttons({ onLog }: { onLog: (line: string) => void }) {
   const setState = store.useSetContextState()
   const getSnapshot = store.useStateSnapshotGetter()

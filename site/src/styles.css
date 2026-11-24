@@ -119,7 +119,7 @@ p code, li code { background: var(--surface); padding: 1px 6px; border-radius: 6
 
 @media (max-width: 900px) {
   .explorer { grid-template-columns: 1fr; }
-  .feature-tabs { position: relative; flex-direction: row; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px 2px; }
+  .feature-tabs { position: relative; flex-direction: row; overflow-x: auto; scrollbar-width: none; margin: -4px -20px 0; padding: 4px 20px; }
   .feature-tabs::-webkit-scrollbar { display: none; }
   .feature-tab { flex: none; padding: 8px 12px 8px 8px; }
   .feature-tab .tile { width: 30px; height: 30px; border-radius: 8px; }
@@ -128,7 +128,7 @@ p code, li code { background: var(--surface); padding: 1px 6px; border-radius: 6
 }
 @media (max-width: 720px) {
   .hero { padding: 48px 0 40px; }
-  .cards { grid-template-columns: 1fr; }
+  .cards, .cards.two { grid-template-columns: 1fr; }
   .header nav { gap: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
