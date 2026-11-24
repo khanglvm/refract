@@ -39,5 +39,6 @@ design-previews/
 # Personal code index
 .codegraph/
 
-# Landing page build
+# Landing page build and Wrangler's local state
 site/dist/
+.wrangler/
