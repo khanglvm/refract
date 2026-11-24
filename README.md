@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/khanglvm/refract/main/assets/banner-dark.png">
-    <img src="https://raw.githubusercontent.com/khanglvm/refract/main/assets/banner-light.png" alt="Refract: scoped React state with selectors and rollback" width="640">
+    <img src="https://raw.githubusercontent.com/khanglvm/refract/main/assets/banner-light.png" alt="Refract: React state that rerenders only what changed" width="640">
   </picture>
 </p>
 
@@ -14,7 +14,9 @@
   <a href="https://refract.khangle.dev">Website</a> | <a href="https://docs.khangle.dev/refract">Docs</a>
 </p>
 
-Refract is a React state library for state that several components of one feature share, such as a form, an editor or a page's filters. `createContextState<State>()` gives you a Provider, the component that holds the state, and hooks typed to `State`. Each Provider you render owns its own store. Components read it through selectors, functions that pick the part of the state they need, and rerender only when that part changes. Updates are a partial object or an Immer draft, a copy of the state you change in place while Immer builds the next state from it. Every update returns a function that undoes it.
+Refract is React state for a feature that several components share, such as a form, an editor, a cart or a page's filters. Each component reads the value it needs through a selector and rerenders only when that value changes. You write updates as plain assignments on an Immer draft, so nested changes need no spreading, and by default each update returns a function that undoes it. It works in the Next.js App Router and in server rendering.
+
+`createContextState<State>()` returns a Provider and hooks typed to `State`. Each Provider you render holds its own store.
 
 ## Install
 
@@ -57,11 +59,51 @@ Clicking the button rerenders `Count`, which selects `state.count`. `AddOne` onl
 
 ## Why Refract
 
-- Where you place the Provider decides who shares the state: the whole app, one route, or each card in a list.
-- Selector results are compared by value, so a selector can return a new object.
-- Each update returns `revert`, so you can show a change before the server confirms it and undo it if the request fails.
-- During server rendering each Provider creates its own store, so two requests never share state. Every module ships with `'use client'` for the Next.js App Router.
-- A snapshot getter reads the current state inside async handlers without subscribing the component.
+### Components rerender only for what they read
+
+When the value of a plain React context changes, every component that reads that context rerenders. A Refract hook subscribes to the result of its selector instead, and compares each new result with the previous one by value:
+
+- A component that reads `state.user.address.city` does not rerender when `state.filter` changes.
+- A selector can return derived data such as `state.todos.filter(t => t.done)`. The component rerenders when the list of done todos changes, not every time the selector builds a new array.
+- A component that only calls `useSetContextState()` never subscribes, so no update rerenders it.
+- Several `setState` calls in the same synchronous code, such as one event handler, notify subscribers once.
+- The Provider compares `initialState` and `children` by value, so a parent that rerenders and passes an equal `initialState` object does not rerender the tree below it.
+
+In development builds, `useContextStateValue` runs each selector twice and throws if the two results differ. This catches a selector such as `s => ({ id: Math.random() })`, which would otherwise rerender in a loop.
+
+### Read and write nested state without spreading
+
+`setState` takes an Immer draft, so a nested change is one assignment:
+
+```tsx
+// useState
+setUser(user => ({ ...user, address: { ...user.address, city: 'Hanoi' } }))
+
+// Refract
+setState(draft => { draft.user.address.city = 'Hanoi' })
+```
+
+To replace top-level keys, pass a partial object: `setState({ filter: 'done' })` sets `filter` and keeps every other key. To read, select the value itself (`s => s.user.address.city`) instead of taking the whole state and destructuring it. `useContextState` returns the value, the setter and a snapshot getter in one tuple:
+
+```tsx
+const [city, setState, getSnapshot] = store.useContextState(s => s.user.address.city)
+```
+
+`getSnapshot(s => s.cart)` reads the latest state at the moment you call it, for example after an `await` in an async handler, so the handler never works from a stale value, and reading it does not subscribe the component.
+
+### Built for the Next.js App Router
+
+- Every module in the package starts with `'use client'`. Put `'use client'` at the top of your own store file too, and a server component can render that store's Provider and pass it data it fetched as `initialState`.
+- During server rendering, each Provider creates its own store, so two requests never share state. The hooks give React a server snapshot, so the page hydrates from the same `initialState`.
+- Give a store an ID, as in `createContextState<State>('cart')`, and a store module that runs twice in the browser, because it landed in two chunks or hot reload ran it again, still finds the same Provider.
+
+### Undo any update
+
+Every `setState` returns `revert`. It undoes only the fields that update changed and leaves later, unrelated updates in place, so an optimistic save can show the change at once and call `revert()` if the request fails. Pass `false` to `useSetContextState` or as the second argument of `useContextState` to skip that tracking where you never undo.
+
+### Scope state by where you put the Provider
+
+State lives in the Provider, not in a module-level store. Render one Provider for the whole app, one per route, or one per card in a list, and each gets its own state. `withContextProvider` wraps a component with its own Provider and can copy changed props into its state.
 
 ## Docs
 

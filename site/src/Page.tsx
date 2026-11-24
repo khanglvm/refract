@@ -33,11 +33,11 @@ export default function App() {
 }`
 
 const FEATURES = [
-  { icon: FilterIcon, title: 'Selectors', body: 'A component reads one slice and rerenders only when that slice changes. Results compare by value, so a selector can build a new object.' },
-  { icon: PenIcon, title: 'Immer drafts', body: 'Write updates as plain mutations on a draft, or pass a partial object. State stays frozen between updates.' },
-  { icon: UndoIcon, title: 'Rollback', body: 'Every update returns a function that undoes it, which makes optimistic saves a few lines.' },
+  { icon: FilterIcon, title: 'Fine-grained rerenders', body: 'A component rerenders only when the value its selector returns changes, compared by value, so derived arrays and objects are safe. Writer-only components never subscribe.' },
+  { icon: PenIcon, title: 'No spreading', body: 'Write draft.user.address.city = "Hanoi" and Immer builds the next state. A partial object replaces only the top-level keys you pass.' },
+  { icon: ServerIcon, title: 'Next.js ready', body: "Every module ships with 'use client'. Seed a Provider from a server component, and each server render gets its own store." },
+  { icon: UndoIcon, title: 'Undo any update', body: 'Every update returns revert, which undoes only what that update changed. Optimistic saves take a few lines.' },
   { icon: LayersIcon, title: 'Scoped stores', body: 'State lives in the Provider. Mount one per app, per route or per list item, and nest them freely.' },
-  { icon: ServerIcon, title: 'Server ready', body: 'Works with React 18 and 19, server rendering and the Next.js App Router. Each request gets its own store.' },
 ]
 
 function Header() {
@@ -57,10 +57,10 @@ function Hero() {
   return (
     <section className="hero">
       <div className="hero-mark"><Logo size={96} /></div>
-      <h1>Scoped React state with selectors and rollback</h1>
+      <h1>React state that rerenders only what changed</h1>
       <p className="lead">
-        Refract gives each Provider its own typed store. Components read the slice they need and rerender only when it
-        changes. Updates are Immer drafts, and each one can be undone.
+        Each component reads the value it needs and rerenders only when that value changes. Write nested updates as plain
+        assignments, undo any of them, and use the same store in the Next.js App Router.
       </p>
       <CopyCommand command="npm i refract-state" />
       <div className="actions">

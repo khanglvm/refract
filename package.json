@@ -1,7 +1,7 @@
 {
   "name": "refract-state",
-  "version": "1.0.0",
-  "description": "Scoped React state with selectors and rollback. Each Provider owns a typed store; components subscribe through selectors, update with Immer drafts, and can undo any update. Works with React 18/19 and Next.js App Router.",
+  "version": "1.0.1",
+  "description": "Typed React state with fine-grained rerenders: components rerender only when their selected value changes, updates are Immer draft assignments with no spreading, and every update can be undone. Works with React 18/19, server rendering and the Next.js App Router.",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",

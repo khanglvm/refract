@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+Docs only. The README, the docs overview and `llms.txt` now describe what the engine does: rerenders limited to components whose selected value changed, nested updates without spreading, Next.js App Router and server rendering support, and undo. No code changes.
+
 ## 1.0.0
 
 First standalone release. Refract is `createContextState` extracted from `@khanglvm/react` 1.3.0, with the same behavior.

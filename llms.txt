@@ -1,6 +1,6 @@
 # Refract
 
-> Scoped React state with selectors and rollback for TypeScript apps in React or the Next.js App Router. createContextState<State>() returns a Provider and hooks: components subscribe through selectors compared by value, update with partial objects or Immer drafts, read the latest state with a snapshot getter, and undo any single update with the revert function it returns. React 18 or 19, ES modules, Immer as the only dependency, 'use client' on every module.
+> Typed React state with fine-grained rerenders for React and the Next.js App Router. createContextState<State>() returns a Provider and hooks: a component rerenders only when its selector's result changes (compared by value), writer-only components never subscribe, updates are Immer draft assignments or partial objects with no spreading, a snapshot getter reads the latest state in async handlers, and each update returns a revert function. Each Provider owns its store, and on the server each render gets a fresh one. React 18 or 19, ES modules, Immer as the only dependency, 'use client' on every module.
 
 Install with `npm i refract-state`. Inside an installed project these pages are at node_modules/refract-state/docs/ and match the installed version.
 
