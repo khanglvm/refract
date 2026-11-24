@@ -190,8 +190,10 @@ test('selectors skip unrelated changes and synchronous updates share one postFlu
     await act(async () => {
       set({ count: 1 })
       set(draft => { draft.count++ })
-      assert.equal(snapshot().count, 2)
       assert.equal(flushes, 0)
+      // A read before the batch runs the callback early, so derived values are never behind.
+      assert.equal(snapshot().doubled, 4)
+      assert.equal(flushes, 1)
       await Promise.resolve()
     })
     assert.equal(flushes, 1)
@@ -239,6 +241,38 @@ test('a post-flush callback registered after earlier updates still runs for them
     })
     await act(async () => { await Promise.resolve() })
     assert.equal(container.textContent, '5:10')
+  } finally {
+    await act(async () => root.unmount())
+  }
+})
+
+test('an update that changes nothing notifies no one', async () => {
+  installDOM()
+  const state = createContextState<{ count: number }>()
+  let set!: ReturnType<typeof state.useSetContextState>
+  let fast!: ReturnType<typeof state.useSetContextState>
+  let selectorCalls = 0
+  function Controls() {
+    set = state.useSetContextState()
+    fast = state.useSetContextState(false)
+    return null
+  }
+  function Count() {
+    const value = state.useContextState(s => { selectorCalls++; return s.count })[0]
+    return <span>{value}</span>
+  }
+  const root = createRoot(document.createElement('div'))
+  try {
+    await act(async () => {
+      root.render(<state.Provider initialState={{ count: 1 }}><Controls /><Count /></state.Provider>)
+    })
+    const before = selectorCalls
+    await act(async () => {
+      set({ count: 1 })
+      set(draft => { draft.count = 1 })
+      fast(draft => { draft.count = 1 })
+    })
+    assert.equal(selectorCalls, before)
   } finally {
     await act(async () => root.unmount())
   }
@@ -527,11 +561,18 @@ test('without a post-flush callback, several updates in one click render once', 
   const container = document.body.appendChild(document.createElement('div'))
   const root = createRoot(container)
   const tick = () => new Promise(resolve => setTimeout(resolve, 0))
+  // A root outside act renders on the scheduler's own timing, which can take more than one tick under load.
+  const waitFor = async (ready: () => boolean) => {
+    for (let i = 0; i < 50 && !ready(); i++) await tick()
+    assert.ok(ready())
+  }
   try {
     root.render(<store.Provider initialState={{ a: 0, b: 0 }}><Sum /><Button /></store.Provider>)
-    await tick()
+    await waitFor(() => container.querySelector('button') !== null)
     const before = renders
     container.querySelector('button')!.dispatchEvent(new dom!.window.MouseEvent('click', { bubbles: true }))
+    await waitFor(() => container.querySelector('span')!.textContent === '4')
+    // Give any extra render from the three updates time to land before counting.
     await tick()
     assert.equal(container.querySelector('span')!.textContent, '4')
     assert.equal(renders, before + 1)

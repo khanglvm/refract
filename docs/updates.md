@@ -48,6 +48,12 @@ Like Immer, the freeze does not reach class instances, the keys and values insid
 
 The state changes immediately, so the snapshot getter sees it on the next line. Subscribers are notified right away, and React batches the renders, so several `setState` calls in one handler cause one rerender pass. A store with a [post-flush callback](post-flush.md) notifies once per batch instead.
 
+An update that changes nothing, such as assigning a field the value it already has, notifies no one.
+
+- Each update runs the selector of every component that subscribes to the store. Calling `setState` once per item in a loop runs them once per item, so make one call and change all the items in its draft.
+- Call `setState` from event handlers, effects and async code, not while a component renders. An update during render that changes what another mounted component selects gets React's "Cannot update a component while rendering a different component" warning.
+- With a React 18 legacy root (`ReactDOM.render`), updates in a `setTimeout` or after `await` render once each. Use `createRoot`, or wrap them in `unstable_batchedUpdates`.
+
 ## Read the latest state in handlers
 
 A value from render can be stale in an async handler. `useProfileSnapshot()` returns a getter that reads the current state when called, without subscribing:

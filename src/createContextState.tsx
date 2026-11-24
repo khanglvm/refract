@@ -329,10 +329,11 @@ export function createContextState<State extends Record<string | number, unknown
      * Gets current state value with optional cloning for immutability
      * @param clone - Whether to deep clone the state (default: true)
      */
-    const getStateValue = useCallback(
-      (clone: boolean = true) => (clone ? deepClone(stateRef.current) : stateRef.current),
-      []
-    )
+    const getStateValue = useCallback((clone: boolean = true) => {
+      // A read between an update and its batch would otherwise see derived values from before it.
+      runPendingPostFlush()
+      return clone ? deepClone(stateRef.current) : stateRef.current
+    }, [])
 
     // Set of all React components subscribed to state changes
     const subscribers = useRef(new Set<() => void>())
@@ -348,10 +349,22 @@ export function createContextState<State extends Record<string | number, unknown
     // later (often in an effect that runs after a sibling's mount effect) still owes those updates a pass.
     const updatedWithoutPostFlushRef = useRef(false)
 
+    // Whether updates since the last post-flush pass still owe the callback a run.
+    const postFlushDueRef = useRef(false)
+
     // SSR-safe microtask scheduler
     const scheduleMicrotask = typeof queueMicrotask === 'function'
       ? queueMicrotask
       : (fn: () => void) => { Promise.resolve().then(fn) }
+
+    // Runs the post-flush callback once for the updates since its last pass. Both the batch and any
+    // earlier read call it, so the callback still runs once per batch when nothing reads in between.
+    function runPendingPostFlush() {
+      if (!postFlushDueRef.current || !postFlushRef.current) return
+      postFlushDueRef.current = false
+      // produce, not produceWithPatches: the callback's changes are not part of any revert.
+      stateRef.current = produce(stateRef.current, postFlushRef.current)
+    }
 
     // Iterates over a copy, so a subscriber that unsubscribes while being notified cannot skip another.
     function notifySubscribers() {
@@ -369,7 +382,8 @@ export function createContextState<State extends Record<string | number, unknown
      * React still batches the resulting renders, so several updates in one handler render once.
      *
      * With a post-flush callback, updates in the same tick are batched into one microtask instead,
-     * so the callback runs once per batch and subscribers are notified only after it has run.
+     * so the callback runs once per batch and subscribers are notified only after it has run. A read
+     * before the batch runs the callback early, so it never sees derived values that are behind.
      */
     function emitChanges() {
       if (!postFlushRef.current) {
@@ -377,19 +391,13 @@ export function createContextState<State extends Record<string | number, unknown
         notifySubscribers()
         return
       }
+      postFlushDueRef.current = true
       if (!batchPendingRef.current) {
         batchPendingRef.current = true
+        // queueMicrotask fires before paint, so subscribers render the batch in the same frame.
         scheduleMicrotask(() => {
           batchPendingRef.current = false
-          // Run postFlush callback if registered (e.g., lazy hierarchy recompute).
-          // Uses produce (not produceWithPatches) since patches are not needed here.
-          // Microtask batching is safe with useSyncExternalStore: stateRef.current is
-          // already updated synchronously; queueMicrotask fires before browser paint,
-          // so subscribers see consistent state when React checks snapshots.
-          if (postFlushRef.current) {
-            stateRef.current = produce(stateRef.current, postFlushRef.current)
-          }
-          // Notify all subscribers after all mutations + postFlush are applied
+          runPendingPostFlush()
           notifySubscribers()
         })
       }
@@ -474,10 +482,10 @@ export function createContextState<State extends Record<string | number, unknown
         emitChanges()
       }
 
-      // Apply new state — produceWithPatches returns the complete next state, no spread needed
-      stateRef.current = newPartialStateValue
+      // Immer returns the same state when the update changed nothing; no subscriber needs to hear about it.
+      if (newPartialStateValue === stateRef.current) return () => {}
 
-      // Notify all subscribers of state change (batched via microtask)
+      stateRef.current = newPartialStateValue
       emitChanges()
 
       return revertChanges
@@ -492,8 +500,11 @@ export function createContextState<State extends Record<string | number, unknown
           })
         }
 
-      stateRef.current = produce(stateRef.current, receiptFn)
-      emitChanges()
+      const nextState = produce(stateRef.current, receiptFn)
+      if (nextState !== stateRef.current) {
+        stateRef.current = nextState
+        emitChanges()
+      }
 
       return () => {} // no-op revert
     }, []);

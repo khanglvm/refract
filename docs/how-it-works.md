@@ -6,7 +6,7 @@ This page explains what Refract does on each read and update, what that costs, a
 
 The Provider keeps the state in a ref, next to a set of subscribers. Hooks subscribe through React's `useSyncExternalStore`. On a change, every subscriber of that Provider runs its selector, and a component rerenders only if its selected value differs by value from the previous one. Each hook caches its last selected value and returns that same reference while the content is unchanged, which `useSyncExternalStore` needs to avoid rerendering in a loop.
 
-This is selector-level filtering, not field-level dependency tracking. Many subscribers with heavy selectors still cost work on each update.
+This is selector-level filtering, not field-level dependency tracking. Many subscribers with heavy selectors still cost work on each update, so a handler that changes many items should make one `setState` call with all the changes in its draft instead of one call per item. An update that changes nothing notifies no one.
 
 The value comparison descends into plain objects and arrays, compares `Date` by time, `RegExp` by text, and `Map` and `Set` by contents with native key identity. Symbol and non-enumerable properties are ignored, and there is no cycle detection.
 
@@ -16,7 +16,7 @@ Every update goes through Immer. The default setter records patches so the updat
 
 Without a post-flush callback, each update notifies subscribers right away. React needs that for controlled inputs: at the end of an input event it puts back the value the input rendered with, unless a store has already told it about the new one, and a later rewrite moves the caret to the end. React batches the renders those notifications cause, so several updates in one event handler render once.
 
-With a post-flush callback, notifications are batched instead. The first update in a tick queues a microtask; when it runs, the callback applies its changes, and then every subscriber is notified once. The microtask runs before the browser paints. Subscribers are notified only after the callback has run, but a component that rerenders for another reason in the same event, such as a `useState` update, reads the new state before the callback has run.
+With a post-flush callback, notifications are batched instead. The first update in a tick queues a microtask; when it runs, the callback applies its changes, and then every subscriber is notified once. The microtask runs before the browser paints. Any read before then, such as a component that rerenders for another reason in the same event or a snapshot getter call in the handler, runs the callback first, so derived values are never behind the state. The batch then has nothing left to run. A handler that reads between its own updates runs the callback once per read.
 
 Updates made before a callback is registered, for example in a sibling's mount effect, are notified right away; registering the callback then queues one batch so it also runs for them.
 

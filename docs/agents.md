@@ -98,6 +98,8 @@ State shape and updates:
 - Keep state plain data: objects, arrays, primitives, `Date`, `RegExp`, `Map`, `Set`, `ArrayBuffer`, typed arrays. Values in a partial object are deep-copied. `Error`, `Promise`, `WeakMap`, `WeakSet`, `URL` and `Blob` throw `Unsupported type`. Class instances are copied as plain objects and lose their prototype. Functions, `AbortSignal` and `FormData` are kept by reference. Store `String(error)`, not the error.
 - `setState({ field })` replaces whole top-level fields and never merges nested objects. Use `setState(draft => { ... })` for nested edits. A draft function returns nothing.
 - State changes synchronously and subscribers are notified right away; React batches the renders, so several updates in one handler render once. With a post-flush callback registered, notifications wait for one microtask per batch.
+- Each update runs every subscriber's selector. Change many items in one `setState` draft, not one call per item. An update that changes nothing notifies no one.
+- Call `setState` from handlers, effects or async code, never during render.
 
 Freezing:
 
@@ -135,6 +137,7 @@ Post-flush:
 
 - Register once, from one component inside the Provider, in an effect. Each Provider holds one callback; registering again replaces it; there is no unregister.
 - Use it to recompute derived data once per batch: updates set a stale flag, the callback checks the flag and recomputes.
+- A read before the batch (a render or a snapshot getter call) runs the callback early, so derived values are never behind. Reading between a handler's own updates runs it once per read.
 
 ## Next.js App Router
 

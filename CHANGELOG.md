@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- An update that changes nothing, such as assigning a field the value it already has, no longer notifies subscribers, so their selectors do not run.
+- On a store with a post-flush callback, a read before the batch runs the callback first. Before, a component that rerendered for another reason in the same event, or a snapshot getter call in the handler, could see derived values from before the update. The callback still runs once per batch unless something reads between updates. A callback that throws now throws in that read, such as during the render, instead of in the microtask.
+- The docs now say how to keep update cost low: change many items in one `setState` draft, call `setState` outside render, and use `createRoot` for batching outside event handlers.
+
 ## 1.1.0
 
 Controlled inputs keep their caret. Before, typing in the middle of an `<input value={…}>` that read from a store moved the caret to the end, because subscribers heard about the update one microtask after the input event.

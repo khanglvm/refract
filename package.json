@@ -1,6 +1,6 @@
 {
   "name": "refract-state",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Typed React state with fine-grained rerenders: components rerender only when their selected value changes, updates are Immer draft assignments with no spreading, and every update can be undone. Works with React 18/19, server rendering and the Next.js App Router.",
   "type": "module",
   "main": "./dist/index.js",
