@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "index",
+    "install",
+    "quickstart",
+    "---Guides---",
+    "selectors",
+    "updates",
+    "rollback",
+    "data",
+    "feature-hooks",
+    "scopes",
+    "wrap-components",
+    "post-flush",
+    "nextjs",
+    "---Reference---",
+    "api",
+    "how-it-works",
+    "---For agents---",
+    "agents"
+  ]
+}

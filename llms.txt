@@ -1,0 +1,37 @@
+# Brivo
+
+> Scoped React state with selectors and rollback for TypeScript apps in React or the Next.js App Router. createContextState<State>() returns a Provider and hooks: components subscribe through selectors compared by value, update with partial objects or Immer drafts, read the latest state with a snapshot getter, and undo any single update with the revert function it returns. React 18 or 19, ES modules, Immer as the only dependency, 'use client' on every module.
+
+Install with `npm i brivo`. Inside an installed project these pages are at node_modules/brivo/docs/ and match the installed version.
+
+## For agents
+
+- [Brivo for coding agents](https://github.com/khanglvm/brivo/blob/main/docs/agents.md): the import, every factory member with its signature, rules and limits in one page
+
+## Start
+
+- [Overview](https://github.com/khanglvm/brivo/blob/main/docs/index.md): what Brivo is for and when to use another tool
+- [Install](https://github.com/khanglvm/brivo/blob/main/docs/install.md): package contents, peer dependency, development checks
+- [Quick start](https://github.com/khanglvm/brivo/blob/main/docs/quickstart.md): a counter and a store module
+
+## Guides
+
+- [Read with selectors](https://github.com/khanglvm/brivo/blob/main/docs/selectors.md): value comparison, purity rules
+- [Update state](https://github.com/khanglvm/brivo/blob/main/docs/updates.md): partial objects, drafts, copying and freezing, snapshots in handlers
+- [Optimistic updates with revert](https://github.com/khanglvm/brivo/blob/main/docs/rollback.md): what a revert restores
+- [Seed and load data](https://github.com/khanglvm/brivo/blob/main/docs/data.md): initialState, resetting, loading flags
+- [Feature hooks](https://github.com/khanglvm/brivo/blob/main/docs/feature-hooks.md): named read and action hooks
+- [Scope, nesting and several stores](https://github.com/khanglvm/brivo/blob/main/docs/scopes.md): Provider placement and the missing-Provider fallback
+- [Wrap a component with its Provider](https://github.com/khanglvm/brivo/blob/main/docs/wrap-components.md): withContextProvider, bindPropToState, StateSynchronizer
+- [Post-flush callbacks](https://github.com/khanglvm/brivo/blob/main/docs/post-flush.md): derived data once per batch
+- [Next.js App Router](https://github.com/khanglvm/brivo/blob/main/docs/nextjs.md): server and client boundaries, seeding from the server, troubleshooting
+
+## Reference
+
+- [API reference](https://github.com/khanglvm/brivo/blob/main/docs/api.md): signatures of every member and type
+- [How it works](https://github.com/khanglvm/brivo/blob/main/docs/how-it-works.md): read and update cycle, freezing, instance IDs, limits
+
+## Optional
+
+- [Changelog](https://github.com/khanglvm/brivo/blob/main/CHANGELOG.md)
+- [Source](https://github.com/khanglvm/brivo/tree/main/src)
