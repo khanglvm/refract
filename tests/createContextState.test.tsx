@@ -578,6 +578,8 @@ test('without a post-flush callback, several updates in one click render once', 
     assert.equal(renders, before + 1)
   } finally {
     root.unmount()
+    // Let React's scheduler finish the unmount before the next test replaces the DOM globals.
+    for (let i = 0; i < 5; i++) await tick()
     container.remove()
     if (previousAct) Object.defineProperty(globalThis, 'IS_REACT_ACT_ENVIRONMENT', previousAct)
   }
