@@ -38,3 +38,6 @@ design-previews/
 
 # Personal code index
 .codegraph/
+
+# Landing page build
+site/dist/

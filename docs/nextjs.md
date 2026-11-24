@@ -1,6 +1,6 @@
 # Next.js App Router
 
-Brivo stores and their hooks run in client components; a server component can only render a Provider and pass it `initialState`. Most App Router problems with Brivo come from putting a hook or a helper on the wrong side of that line.
+Refract stores and their hooks run in client components; a server component can only render a Provider and pass it `initialState`. Most App Router problems with Refract come from putting a hook or a helper on the wrong side of that line.
 
 ## What runs where
 

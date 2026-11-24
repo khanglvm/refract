@@ -8,7 +8,7 @@ A post-flush callback recomputes an expensive derived value once per batch of up
 // builder/builder-store.ts
 'use client'
 
-import { createContextState } from 'brivo'
+import { createContextState } from 'refract-state'
 
 export type Block = { id: string; parentId: string | null }
 

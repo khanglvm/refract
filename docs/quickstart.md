@@ -1,13 +1,13 @@
 # Quick start
 
-This page builds a counter in one file, then shows the store module layout the rest of the guides use. It assumes Brivo is installed; see [Install](install.md).
+This page builds a counter in one file, then shows the store module layout the rest of the guides use. It assumes Refract is installed; see [Install](install.md).
 
 ## A counter
 
 ```tsx
 'use client' // only needed in the Next.js App Router
 
-import { createContextState } from 'brivo'
+import { createContextState } from 'refract-state'
 
 const counter = createContextState<{ count: number }>()
 
@@ -41,7 +41,7 @@ Give each store its own file. Call the factory at module level, never inside a c
 // profile/profile-store.ts
 'use client'
 
-import { createContextState } from 'brivo'
+import { createContextState } from 'refract-state'
 
 export type ProfileState = {
   profile: { id: string; name: string }

@@ -1,12 +1,12 @@
-# Brivo for coding agents
+# Refract for coding agents
 
-This page is for a coding agent that adds or changes Brivo stores in a React or Next.js app. It lists the install step, the one import, every member the factory returns with its exact signature, the rules that prevent the usual bugs, and the limits.
+This page is for a coding agent that adds or changes Refract stores in a React or Next.js app. It lists the install step, the one import, every member the factory returns with its exact signature, the rules that prevent the usual bugs, and the limits.
 
 ## Setup
 
 - Check the project first: React 18 or 19 is required. Note whether it is a client-only app (Vite or similar) or the Next.js App Router.
-- Install with the project's package manager, for example `npm i brivo`. Immer comes with it; React is a peer dependency.
-- The installed package carries these docs at `node_modules/brivo/docs/` and an index at `node_modules/brivo/llms.txt`, matching the installed version. Online, the pages are at https://github.com/khanglvm/brivo/tree/main/docs.
+- Install with the project's package manager, for example `npm i refract-state`. Immer comes with it; React is a peer dependency.
+- The installed package carries these docs at `node_modules/refract-state/docs/` and an index at `node_modules/refract-state/llms.txt`, matching the installed version. Online, the pages are at https://github.com/khanglvm/refract/tree/main/docs.
 - Typecheck with `tsc --noEmit` after a change. An `interface` used as `State`, a wrong value type in a partial object, and a partial object with only unknown keys are compile errors. An unknown key next to valid ones in a partial object compiles, so check field names yourself.
 
 ## The import
@@ -14,8 +14,8 @@ This page is for a coding agent that adds or changes Brivo stores in a React or 
 There is one entry point and nothing else to import:
 
 ```ts
-import { createContextState } from 'brivo'
-import type { TContextState, TDeepReadonly, TDeepMutable } from 'brivo'
+import { createContextState } from 'refract-state'
+import type { TContextState, TDeepReadonly, TDeepMutable } from 'refract-state'
 ```
 
 The package exports no helpers. Do not import `deepClone`, `deepEqual`, `createStateManager`, a translator or an event API from it; none exist. For an editable copy of state, use `structuredClone`.
@@ -23,7 +23,7 @@ The package exports no helpers. Do not import `deepClone`, `deepEqual`, `createS
 ## Choose where state goes
 
 - State one component owns: `useState`.
-- Data several components of one feature render or edit: a Brivo store.
+- Data several components of one feature render or edit: a Refract store.
 - Server cache concerns (refetching, retries, invalidation): the app's data-fetching library. Copy its results into a store only when components edit them.
 
 ## Write a store module
@@ -32,7 +32,7 @@ The package exports no helpers. Do not import `deepClone`, `deepEqual`, `createS
 // feature/feature-store.ts
 'use client'
 
-import { createContextState } from 'brivo'
+import { createContextState } from 'refract-state'
 
 export type FeatureState = {
   items: { id: string; done: boolean }[]

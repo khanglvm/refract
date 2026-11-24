@@ -2,8 +2,8 @@
 
 ## 1.0.0
 
-First standalone release. Brivo is `createContextState` extracted from `@khanglvm/react` 1.3.0, with the same behavior.
+First standalone release. Refract is `createContextState` extracted from `@khanglvm/react` 1.3.0, with the same behavior.
 
-- Exports `createContextState` and the types `TContextState`, `TDeepReadonly` and `TDeepMutable` from a single entry, `brivo`. Every module ships with `'use client'`.
-- Migrating from `@khanglvm/react`: change the import to `from 'brivo'`. Code that uses only `createContextState` and its types needs no other change.
+- Exports `createContextState` and the types `TContextState`, `TDeepReadonly` and `TDeepMutable` from a single entry, `refract-state`. Every module ships with `'use client'`.
+- Migrating from `@khanglvm/react`: change the import to `from 'refract-state'`. Code that uses only `createContextState` and its types needs no other change.
 - Not included, and still in `@khanglvm/react`: the deprecated `createStateManager` wrapper and its `TStateManager` type, the translator, events and the `helpers` entry. `deepEqual` and `deepClone` are internal now and not exported; use `structuredClone` for an editable copy of state.

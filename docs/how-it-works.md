@@ -1,6 +1,6 @@
 # How it works
 
-This page explains what Brivo does on each read and update, what that costs, and the limits that follow. Read it before you put a large or unusual value in a store.
+This page explains what Refract does on each read and update, what that costs, and the limits that follow. Read it before you put a large or unusual value in a store.
 
 ## Reads
 
@@ -18,7 +18,7 @@ Notifications are batched. The first update in a tick queues a microtask; when i
 
 A partial object is turned into a draft function that assigns a deep copy of each listed field. The copy rules are in [Update state](updates.md#keep-state-to-plain-data).
 
-Brivo enables Immer's `Map`/`Set` and patches plugins when it loads.
+Refract enables Immer's `Map`/`Set` and patches plugins when it loads.
 
 ## Freezing
 
@@ -26,7 +26,7 @@ Brivo enables Immer's `Map`/`Set` and patches plugins when it loads.
 
 ## Instance IDs and the browser
 
-In the browser, the factory keeps its React context in `window.__CONTEXT_STATE__`, a `Map` keyed by the instance ID, or by a fresh symbol when there is none. A module evaluated twice with the same ID gets the same context, so its Providers and hooks still match. The state itself lives in each Provider, not in that map. Brivo's type declarations add `__CONTEXT_STATE__` to the global `Window` interface.
+In the browser, the factory keeps its React context in `window.__CONTEXT_STATE__`, a `Map` keyed by the instance ID, or by a fresh symbol when there is none. A module evaluated twice with the same ID gets the same context, so its Providers and hooks still match. The state itself lives in each Provider, not in that map. Refract's type declarations add `__CONTEXT_STATE__` to the global `Window` interface.
 
 During server rendering, each factory call creates its own context and each Provider its own store, so requests never share state.
 

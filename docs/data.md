@@ -36,7 +36,7 @@ A store can hold fetched data next to the UI state that edits it. Keep the loadi
 // notifications/notification-store.ts
 'use client'
 
-import { createContextState } from 'brivo'
+import { createContextState } from 'refract-state'
 
 export type Notification = { id: string; text: string; read: boolean }
 

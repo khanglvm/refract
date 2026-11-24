@@ -1,4 +1,4 @@
-# Brivo: architecture
+# Refract: architecture
 
 ## Store
 A Provider keeps the current state in a ref and a set of subscribers. Hooks subscribe with `useSyncExternalStore`. Synchronous updates are batched and subscribers are notified once per microtask.
@@ -16,4 +16,4 @@ Server snapshots are cached per Provider and released after hydration. Every bui
 Vite library mode with `preserveModules`; React, React DOM and Immer stay external. `vite-plugin-dts` emits the types.
 
 ## Landing page
-`site/` is a static page served by a Cloudflare Worker with static assets at brivo.khangle.dev.
+`site/` is a static page served by a Cloudflare Worker with static assets at refract.khangle.dev.

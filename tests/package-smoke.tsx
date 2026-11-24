@@ -1,8 +1,8 @@
 // Imports the built package by name, as a consumer would, and renders a store on the server.
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
-import { createContextState } from 'brivo'
-import type { TContextState, TDeepReadonly } from 'brivo'
+import { createContextState } from 'refract-state'
+import type { TContextState, TDeepReadonly } from 'refract-state'
 
 const store = createContextState<{ count: number }>()
 function Value() { const count = store.useContextStateValue(s => s.count); return createElement('span', null, count) }

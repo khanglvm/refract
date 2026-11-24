@@ -28,6 +28,6 @@ Two Providers of the same store can nest as well. A hook reads the nearest one a
 
 ## Outside the Provider
 
-A component outside its matching Provider gets an empty fallback store: selectors read `{}` and setters do nothing. Brivo raises no missing-Provider error, but a selector that reads a nested field, such as `state => state.profile.name`, throws a `TypeError`. Development builds log a one-time warning per store.
+A component outside its matching Provider gets an empty fallback store: selectors read `{}` and setters do nothing. Refract raises no missing-Provider error, but a selector that reads a nested field, such as `state => state.profile.name`, throws a `TypeError`. Development builds log a one-time warning per store.
 
 If an update seems to vanish, check that the component sits under the Provider created by the same factory call.

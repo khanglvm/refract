@@ -1,6 +1,6 @@
-# Working on Brivo
+# Working on Refract
 
-Brivo is a React state library: `createContextState<State>()` returns a Provider and hooks for one typed store. Components read through selectors, update with Immer drafts, and can undo each update. It was extracted from `@khanglvm/react` (khanglvm/react), which now depends on it.
+Refract is a React state library: `createContextState<State>()` returns a Provider and hooks for one typed store. Components read through selectors, update with Immer drafts, and can undo each update. It was extracted from `@khanglvm/react` (khanglvm/react), which now depends on it.
 
 ## Layout
 
@@ -9,7 +9,8 @@ Brivo is a React state library: `createContextState<State>()` returns a Provider
 - `src/types.ts`: `TDeepReadonly` and `TDeepMutable`, exported for hook signatures.
 - `src/index.ts`: the one public entry.
 - `tests/`: unit tests (`*.test.tsx`), the built-package smoke test and the "use client" check.
-- `site/`: the landing page at https://brivo.khangle.dev (see its README).
+- `site/`: the landing page at https://refract.khangle.dev, a Vite + React page whose demo imports `src/` directly. `npm run site:build` builds it into `site/dist`; `npm run site:deploy` builds and deploys it with wrangler (Cloudflare Worker `refract-site`, static assets, custom domain). Deploy after any change to `site/` or to behaviour the demo shows. Design rules: DESIGN.md.
+- `assets/`: logo, banners and icon (see DESIGN.md).
 - `docs/`: the docs, published on docs.khangle.dev.
 
 ## Checks
@@ -35,4 +36,4 @@ Install dependencies with `project-deps install` (npm, `package-lock.json`).
 
 The `Publish npm package` workflow (`.github/workflows/npm-auto-publish.yml`) publishes with npm trusted publishing when a push to `main` changes `version` in `package.json` and that version is not on npm yet. Bump the version in the same change as the work it releases and add its entry to `CHANGELOG.md`. A docs-only change still needs a patch release so the npm page shows the new README.
 
-After a release, update the `brivo` dependency range in khanglvm/react when the change matters to its users.
+After a release, update the `refract-state` dependency range in khanglvm/react when the change matters to its users.

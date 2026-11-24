@@ -1,5 +1,5 @@
 {
-  "name": "brivo",
+  "name": "refract-state",
   "version": "1.0.0",
   "description": "Scoped React state with selectors and rollback. Each Provider owns a typed store; components subscribe through selectors, update with Immer drafts, and can undo any update. Works with React 18/19 and Next.js App Router.",
   "type": "module",
@@ -34,7 +34,9 @@
     "prepublishOnly": "npm run test && npm run clean && npm run build && npm run test:package",
     "test": "node --expose-gc --import tsx --test tests/*.test.tsx",
     "test:package": "tsc --noEmit --strict --module NodeNext --moduleResolution NodeNext --jsx react-jsx --target ES2020 tests/package-smoke.tsx && node --import tsx tests/package-smoke.tsx && node tests/server-smoke.mjs",
-    "docs:check": "node scripts/docs-readme.mjs --check"
+    "docs:check": "node scripts/docs-readme.mjs --check",
+    "site:build": "tsc --noEmit -p site/tsconfig.json && vite build --config site/vite.config.ts",
+    "site:deploy": "npm run site:build && cd site && npx --yes wrangler@4 deploy"
   },
   "keywords": [
     "react",
@@ -60,11 +62,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/khanglvm/brivo.git"
+    "url": "git+https://github.com/khanglvm/refract.git"
   },
-  "homepage": "https://brivo.khangle.dev",
+  "homepage": "https://refract.khangle.dev",
   "bugs": {
-    "url": "https://github.com/khanglvm/brivo/issues"
+    "url": "https://github.com/khanglvm/refract/issues"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

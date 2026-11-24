@@ -1,12 +1,12 @@
 # API reference
 
-Brivo exports one function, `createContextState`, and three types. This page lists the signature and behavior of each member the factory returns.
+Refract exports one function, `createContextState`, and three types. This page lists the signature and behavior of each member the factory returns.
 
 ## createContextState
 
 ```ts
-import { createContextState } from 'brivo'
-import type { TContextState, TDeepReadonly, TDeepMutable } from 'brivo'
+import { createContextState } from 'refract-state'
+import type { TContextState, TDeepReadonly, TDeepMutable } from 'refract-state'
 ```
 
 ```ts

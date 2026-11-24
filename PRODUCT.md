@@ -1,4 +1,4 @@
-# Brivo: product
+# Refract: product
 
 ## Who it is for
 React and Next.js developers who share state across the components of one feature (a form, an editor, a page's filters, the app shell) and want it scoped to a Provider instead of a global store.
@@ -14,7 +14,7 @@ React and Next.js developers who share state across the components of one featur
 Server cache concerns (refetching, retries, invalidation), devtools, persistence and middleware. Pair it with a data-fetching library.
 
 ## Surfaces
-- npm: `brivo`
-- GitHub: https://github.com/khanglvm/brivo
-- Landing page: https://brivo.khangle.dev
-- Docs: https://docs.khangle.dev/brivo
+- npm: `refract-state`
+- GitHub: https://github.com/khanglvm/refract
+- Landing page: https://refract.khangle.dev
+- Docs: https://docs.khangle.dev/refract
